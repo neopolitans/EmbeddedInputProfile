@@ -24,6 +24,9 @@
 //#define EIM_OPTMOD_InputProfile_DecoupleFromEmbeddedInputModule             // Masks all EmbeddedInputModule Dependent References and Classes.
                                                                               // Provided to make using all core classes possible outside of EIM.
 
+//#define EIM_OPTMOD_InputProfile_DisableCtxAxisGamepadCtrlConstructors       // Disable additional/Quality-of-Life constructors to reduce member count
+                                                                              // of the ContextualAxis. This doesn't matter if the module is decoupled.
+
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 // P.S. This is the second rewrite to incorporate decoupling. The original was written for UnityEngine.Input and then first rewritten for InputSystem + EIM.
 
@@ -66,28 +69,29 @@ public abstract class AbstractContextualAction
 {
     // Members
     /// <summary>
-    /// The method(s) to trigger when this action is rebound.
+    /// The delegate called when the Action is rebound during runtime.
     /// </summary>
     public System.Action onRebind = null;
 
     /// <summary>
-    /// The label of this action. <br/>
-    /// Used to query for actions.
+    /// The name that identifies the Action.<br/>
+    /// Used to query the action during runtime. 
     /// </summary>
     public string label { get; protected set; } = "";
 
     /// <summary>
-    /// Is this action a binding for an Input Axis?
+    /// Does the type of the Action match that of a Virtual Axis?
     /// </summary>
-    public bool isAxis => GetType() == typeof(BaseContextualAxis);
+    public virtual bool isAxis => GetType() == typeof(BaseContextualAxis);
 
     /// <summary>
-    /// Is this action a binding for a Virtual Button?
+    /// Does the type of the action match that of a Virtual Button?
     /// </summary>
-    public bool isButton => GetType() == typeof(IDeviceInputButton);
+    public virtual bool isButton => GetType() == typeof(IDeviceInputButton);
 
     /// <summary>
-    /// Creates a new instance of the action with the same data provided for the original object.
+    /// Creates a duplicate of the action. <br/>
+    /// This will provide the data of the current instance to the class’ constructor.
     /// </summary>
     /// <returns></returns>
     public abstract AbstractContextualAction Clone();
@@ -106,8 +110,8 @@ public abstract class BaseContextualAction<TEnum> : AbstractContextualAction whe
     // This is going to be trickier to work with, but probably far more worth it in the long run.
 
     /// <summary>
-    /// The input source. <br/>
-    /// This can be a Key Code, Available Input Axis or other representation.   
+    /// The source of an action’s input values.<br/>
+    /// An example being a KeyCode value, returning  the respective button’s state.
     /// </summary>
     public TEnum inputSource
     {
@@ -163,7 +167,7 @@ public abstract class BaseContextualAxis : BaseContextualAction<AvailableInputAx
     // A class was needed that held a Vector2 Value to get any input motions from an input axis.
 
     /// <summary>
-    /// The value being read from the Input Axis.
+    /// A Vector2 directly provided from a joystick, mouse or virtual axis of buttons.
     /// </summary>
     public abstract Vector2 Value { get; }
 }
@@ -177,7 +181,7 @@ public class InputProfile
 {
     // Members
     /// <summary>
-    /// The Actions contained in this Input Profile
+    /// The actions contained in the profile which can be queried.
     /// </summary>
     public AbstractContextualAction[] actions = new AbstractContextualAction[0];
 
@@ -197,7 +201,7 @@ public class InputProfile
     /// </summary>
     /// <param name="buttonName">The name of the Virtual Button.</param>
     /// <returns></returns>
-    public bool GetButton(string buttonName)
+    public virtual bool GetButton(string buttonName)
     {
         if (actions.Length < 1) return false;
 
@@ -217,7 +221,7 @@ public class InputProfile
     /// </summary>
     /// <param name="buttonName">The name of the Virtual Button.</param>
     /// <returns></returns>
-    public bool GetButtonDown(string buttonName)
+    public virtual bool GetButtonDown(string buttonName)
     {
         if (actions.Length < 1) return false;
 
@@ -237,7 +241,7 @@ public class InputProfile
     /// </summary>
     /// <param name="buttonName">The name of the Virtual Button.</param>
     /// <returns></returns>
-    public bool GetButtonUp(string buttonName)
+    public virtual bool GetButtonUp(string buttonName)
     {
         if (actions.Length < 1) return false;
 
@@ -254,11 +258,11 @@ public class InputProfile
 
     /// <summary>
     /// Returns the value of the virtual axis identified by axisName. <br/>
-    /// The value will be in the range of -1 to 1 for keyboard and joystick input devices.
+    /// The values will be in the range of -1 to 1 for keyboard, joystick and mouse input devices.
     /// </summary>
     /// <param name="axisName">The name of the Virtual Axis.</param>
     /// <returns></returns>
-    public Vector2 GetAxis(string axisName)
+    public virtual Vector2 GetAxis(string axisName)
     {
         if (actions.Length < 1) return Vector2.zero;
 
@@ -293,7 +297,7 @@ public class InputProfile
 #if !EIM_OPTMOD_InputProfile_DecoupleFromEmbeddedInputModule
 
 /// <summary>
-/// A virtual button that represents a key on a Keyboard, Mouse or Gamepad.
+/// A virtual button representing a key on a Keyboard, Mouse or Gamepad.
 /// </summary>
 [System.Serializable]
 public class ContextualKey : BaseContextualButton<KeyCode>
@@ -307,7 +311,7 @@ public class ContextualKey : BaseContextualButton<KeyCode>
     // Properties
 
     /// <summary>
-    /// The alternate Input Source, if an alternate is desired.
+    /// An optional alternate input source used for the virtual button’s input state.
     /// </summary>
     public KeyCode altInputSource
     {
@@ -390,7 +394,7 @@ public class ContextualKey : BaseContextualButton<KeyCode>
 }
 
 /// <summary>
-/// A virtual button that represents a control on a Gamepad.
+/// A virtual button representing a control on a Gamepad.
 /// </summary>
 [System.Serializable]
 public class ContextualGamepadButton : BaseContextualButton<GamepadControl>
@@ -442,7 +446,7 @@ public class ContextualGamepadButton : BaseContextualButton<GamepadControl>
 }
 
 /// <summary>
-/// A virtual axis that represents a multi-directional control through a Joystick, Mouse or set of 4 buttons.
+/// A virtual axis that represents a multi-directional control from a Joystick, Mouse or set of 4 buttons.
 /// </summary>
 [System.Serializable]
 public class ContextualAxis : BaseContextualAxis
@@ -612,30 +616,6 @@ public class ContextualAxis : BaseContextualAxis
     }
 
     /// <summary>
-    /// Create a Virtual Axis that reads from a set of four gamepad buttons for it's positive X/Y and negative X/Y values. <br/>
-    /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
-    /// </summary>
-    /// <param name="label"></param>
-    /// <param name="positiveX"></param>
-    /// <param name="negativeX"></param>
-    /// <param name="positiveY"></param>
-    /// <param name="negativeY"></param>
-    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY)
-    {
-        // Set the input source as a button axis.
-        inputSource = AvailableInputAxes.ButtonAxis;
-
-        // Set the label to the provided one, for navigation sake.
-        this.label = label;
-
-        // Assign all buttons to the respective directions.
-        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
-        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
-        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
-        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
-    }
-    
-    /// <summary>
     /// Create a Virtual Axis that reads from a specific joystick axis. <br/>
     /// Contains a callback delegate which is called on any input being Rebound.<br/><br/>
     /// For Button Axes, use the alternate constructors: <br/>
@@ -685,29 +665,6 @@ public class ContextualAxis : BaseContextualAxis
     }
 
     /// <summary>
-    /// Create a Virtual Axis that reads from a set of four gamepad buttons for it's positive X/Y and negative X/Y values.<br/>
-    /// Contains a callback delegate which is called on any input being Rebound.<br/><br/>
-    /// For Joystick axes, use the alternate constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
-    /// </summary>
-    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY, System.Action onRebind)
-    {
-        // Set the input source as a button axis.
-        inputSource = AvailableInputAxes.ButtonAxis;
-
-        // Set the label to the provided one, for navigation sake.
-        this.label = label;
-
-        // Set OnRebind Callback.
-        this.onRebind = onRebind;
-
-        // Assign all buttons to the respective directions.
-        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
-        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
-        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
-        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
-    }
-
-    /// <summary>
     /// Create a Virtual Axis that reads from a set of four keys for either it's primary or secondary positive X/Y and negative X/Y values. <br/>
     /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
     /// </summary>
@@ -728,29 +685,6 @@ public class ContextualAxis : BaseContextualAxis
         m_altNegativeX = altNegativeX;
         m_altPositiveY = altPositiveY;
         m_altNegativeY = altNegativeY;
-    }
-
-    /// <summary>
-    /// Create a Virtual Axis that reads from a set of four gamepad buttons for either it's primary or secondary positive X/Y and negative X/Y values. <br/>
-    /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
-    /// </summary>
-    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY, GamepadControl altPositiveX, GamepadControl altNegativeX, GamepadControl altPositiveY, GamepadControl altNegativeY)
-    {
-        // Set the input source as a button axis.
-        inputSource = AvailableInputAxes.ButtonAxis;
-
-        // Set the label to the provided one, for navigation sake.
-        this.label = label;
-
-        // Assign all buttons to the respective directions.
-        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
-        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
-        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
-        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
-        m_altPositiveX = Input.GamepadControlToKeyCode(altPositiveX);
-        m_altNegativeX = Input.GamepadControlToKeyCode(altNegativeX);
-        m_altPositiveY = Input.GamepadControlToKeyCode(altPositiveY);
-        m_altNegativeY = Input.GamepadControlToKeyCode(altNegativeY);
     }
 
     /// <summary>
@@ -779,6 +713,77 @@ public class ContextualAxis : BaseContextualAxis
         m_altNegativeY = altNegativeY;
     }
 
+    #if !EIM_OPTMOD_InputProfile_DisableCtxAxisGamepadCtrlConstructors
+    /// <summary>
+    /// Create a Virtual Axis that reads from a set of four gamepad buttons for it's positive X/Y and negative X/Y values. <br/>
+    /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
+    /// </summary>
+    /// <param name="label"></param>
+    /// <param name="positiveX"></param>
+    /// <param name="negativeX"></param>
+    /// <param name="positiveY"></param>
+    /// <param name="negativeY"></param>
+    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY)
+    {
+        // Set the input source as a button axis.
+        inputSource = AvailableInputAxes.ButtonAxis;
+
+        // Set the label to the provided one, for navigation sake.
+        this.label = label;
+
+        // Assign all buttons to the respective directions.
+        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
+        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
+        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
+        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
+    }
+
+    /// <summary>
+    /// Create a Virtual Axis that reads from a set of four gamepad buttons for it's positive X/Y and negative X/Y values.<br/>
+    /// Contains a callback delegate which is called on any input being Rebound.<br/><br/>
+    /// For Joystick axes, use the alternate constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
+    /// </summary>
+    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY, System.Action onRebind)
+    {
+        // Set the input source as a button axis.
+        inputSource = AvailableInputAxes.ButtonAxis;
+
+        // Set the label to the provided one, for navigation sake.
+        this.label = label;
+
+        // Set OnRebind Callback.
+        this.onRebind = onRebind;
+
+        // Assign all buttons to the respective directions.
+        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
+        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
+        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
+        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
+    }
+
+    /// <summary>
+    /// Create a Virtual Axis that reads from a set of four gamepad buttons for either it's primary or secondary positive X/Y and negative X/Y values. <br/>
+    /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
+    /// </summary>
+    public ContextualAxis(string label, GamepadControl positiveX, GamepadControl negativeX, GamepadControl positiveY, GamepadControl negativeY, GamepadControl altPositiveX, GamepadControl altNegativeX, GamepadControl altPositiveY, GamepadControl altNegativeY)
+    {
+        // Set the input source as a button axis.
+        inputSource = AvailableInputAxes.ButtonAxis;
+
+        // Set the label to the provided one, for navigation sake.
+        this.label = label;
+
+        // Assign all buttons to the respective directions.
+        m_positiveX = Input.GamepadControlToKeyCode(positiveX);
+        m_negativeX = Input.GamepadControlToKeyCode(negativeX);
+        m_positiveY = Input.GamepadControlToKeyCode(positiveY);
+        m_negativeY = Input.GamepadControlToKeyCode(negativeY);
+        m_altPositiveX = Input.GamepadControlToKeyCode(altPositiveX);
+        m_altNegativeX = Input.GamepadControlToKeyCode(altNegativeX);
+        m_altPositiveY = Input.GamepadControlToKeyCode(altPositiveY);
+        m_altNegativeY = Input.GamepadControlToKeyCode(altNegativeY);
+    }
+
     /// <summary>
     /// Create a Virtual Axis that reads from a set of four gamepad buttons for either it's primary or secondary positive X/Y and negative X/Y values. <br/>
     /// For Joystick axes, use the alterante constructor <see cref="ContextualAxis.ContextualAxis(string, AvailableInputAxes)"/> <br/>
@@ -804,6 +809,7 @@ public class ContextualAxis : BaseContextualAxis
         m_altPositiveY = Input.GamepadControlToKeyCode(altPositiveY);
         m_altNegativeY = Input.GamepadControlToKeyCode(altNegativeY);
     }
+    #endif
 
     // Methods
     public override AbstractContextualAction Clone()
@@ -819,13 +825,13 @@ public class ContextualAxis : BaseContextualAxis
 }
 
 /// <summary>
-/// A class that contains a list of virtual inputs for player actions on a specific platform.
+/// A class containing a list of virtual inputs for player actions with an identifier for a specific platform.
 /// </summary>
 [System.Serializable]
 public class PlatformInputProfile : InputProfile
 {
     /// <summary>
-    /// The platform this InputProfile is created for.
+    /// The platform that this Input Profile is created for.
     /// </summary>
     public Input.InputIconDisplayType platform { get; protected set; }
 
