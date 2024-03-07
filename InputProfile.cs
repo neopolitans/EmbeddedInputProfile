@@ -563,7 +563,9 @@ public class ContextualAxis : BaseContextualAxis
                     if (pYActive) y += 1.0f;
                     if (nYActive) y -= 1.0f;
 
-                    return new Vector2(x, y).normalized;
+                    Vector2 result = new Vector2(x, y);
+                    result.Normalize();
+                    return result;
             }
         }
     }
