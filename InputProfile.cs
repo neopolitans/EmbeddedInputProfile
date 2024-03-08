@@ -82,12 +82,12 @@ public abstract class AbstractContextualAction
     /// <summary>
     /// Does the type of the Action match that of a Virtual Axis?
     /// </summary>
-    public virtual bool isAxis => GetType() == typeof(BaseContextualAxis);
+    public virtual bool isAxis => typeof(BaseContextualAxis).IsInstanceOfType(this);
 
     /// <summary>
     /// Does the type of the action match that of a Virtual Button?
     /// </summary>
-    public virtual bool isButton => GetType() == typeof(IDeviceInputButton);
+    public virtual bool isButton => typeof(IDeviceInputButton).IsInstanceOfType(this);
 
     /// <summary>
     /// Creates a duplicate of the action. <br/>
@@ -209,7 +209,8 @@ public class InputProfile
         {
             if (action.label == buttonName)
             {
-                return ((IDeviceInputButton)action).Held;
+                if (action.isButton) return ((IDeviceInputButton)action).Held;
+                else return false;
             }
         }
 
@@ -229,7 +230,8 @@ public class InputProfile
         {
             if (action.label == buttonName)
             {
-                return ((IDeviceInputButton)action).Pressed;
+                if (action.isButton) return ((IDeviceInputButton)action).Pressed;
+                else return false;
             }
         }
 
@@ -249,7 +251,8 @@ public class InputProfile
         {
             if (action.label == buttonName)
             {
-                return ((IDeviceInputButton)action).Released;
+                if (action.isButton) return ((IDeviceInputButton)action).Released;
+                else return false;
             }
         }
 
@@ -270,7 +273,9 @@ public class InputProfile
         {
             if (action.label == axisName)
             {
-                return ((BaseContextualAxis)action).Value;
+                Debug.Assert(action.isAxis);
+                if (action.isAxis) return ((BaseContextualAxis)action).Value;
+                else return Vector2.zero;
             }
         }
 
