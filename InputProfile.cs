@@ -273,7 +273,6 @@ public class InputProfile
         {
             if (action.label == axisName)
             {
-                Debug.Assert(action.isAxis);
                 if (action.isAxis) return ((BaseContextualAxis)action).Value;
                 else return Vector2.zero;
             }
