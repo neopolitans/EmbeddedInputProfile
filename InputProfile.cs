@@ -282,6 +282,23 @@ public class InputProfile
     }
 
     /// <summary>
+    /// Returns the AbstractContextualAction identified by actionName.
+    /// </summary>
+    /// <remarks>Useful for rebinding controls.</remarks>
+    /// <param name="actionName"></param>
+    /// <returns></returns>
+    public virtual AbstractContextualAction GetAction(string actionName)
+    {
+        foreach (AbstractContextualAction action in actions)
+        {
+            if (action.label != actionName) continue;
+            else return action;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Duplicates all underlying Actions and returns a new instance with all action info.
     /// </summary>
     /// <returns><see cref="InputProfile"/></returns>
