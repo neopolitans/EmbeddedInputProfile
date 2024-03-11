@@ -1,5 +1,29 @@
-# EmbeddedInputProfile
-A C# Script as a module providing classes for Virtual Actions and Rebindable Action Mappings.
+This is a PNG Version of the README. For a PDF Version, see: [Readme (PDF)](https://github.com/neopolitans/EmbeddedInputProfile/blob/main/README.pdf)
 
-Yes this is temporarily public, however, the manual is still in production and will be released shortly.
-Due to private issues, the manual had been delayed to take care of personal matters. Sorry in advance, - Neopolitans/Alex
+Additional Information on Input Profile and other modules will be found on wiki pages on Embedded Input Module's Repository.
+![README_1](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/f441d09c-c750-4fc2-9786-72701b30d86e)
+![README_2](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/d88b8662-d245-46a6-8844-af1fd896abb9)
+![README_3](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/2e386920-d340-4036-a55c-12e78e345159)
+![README_4](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/9d2ef3df-e627-415a-b874-af0a368c1c21)
+![README_5](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/eaacf658-0ce3-4a70-befa-d462878ba317)
+![README_6](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/0245eb81-3034-4a03-83bf-f73a06637002)
+![README_7](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/4951a857-4d1f-45e2-8343-861276eb4b89)
+![README_8](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/004cddb3-5004-4fd2-846e-5f0158e9d30d)
+![README_9](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/c2b823e5-3bb7-4ae9-8a97-4f79709416e6)
+![README_10](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/7efb710f-08b3-48f8-8dcd-6393fe01f8c9)
+![README_11](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/5635334f-bab3-4c86-ae4b-2f5fba4b27da)
+![README_12](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/c287619a-ab66-493f-beec-55d045c4963f)
+![README_13](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/10d46180-b50a-484a-8c86-cefbc7f59a0d)
+![README_14](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/0bcdf8b9-3b87-4f7d-840a-c6cc36d65134)
+![README_15](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/9489ea25-b68f-4ebe-a54c-7c51d70db342)
+![README_16](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/7401398d-f2f1-4a34-8319-3263557db8ba)
+![README_17](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/04cb8da8-7617-4e7b-aa2a-fd5bce6850ac)
+![README_18](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/4767a803-2183-46a2-883a-66fda3ea930c)
+![README_19](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/e44cf5c2-5631-42a0-a62d-6b1ebab60449)
+![README_20](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/1f8c4ff6-265b-4f08-be54-ab232cc2b526)
+![README_21](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/49f38a96-ff05-4d2c-a902-c34fadfb4e94)
+![README_22](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/7736b62f-1976-4b72-bcef-d05a37d43e13)
+![README_23](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/cf8bcb9a-cfe2-48f2-bb2b-b6f99d61779c)
+![README_24](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/ee983517-0365-4047-9654-0449e2732c90)
+![README_25](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/95fff33d-5deb-4cd6-b612-7083dcdf3816)
+![README_26](https://github.com/neopolitans/EmbeddedInputProfile/assets/45230387/cc5cc99c-6a1c-4fae-b66a-c5e8e6d56b5b)
